@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "simple-sip"
+version = "0.1.0"
+description = "Pure-Python SIP VoIP client library"
+license = {text = "MIT"}
+license-files = ["LICENSE"]
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,20 @@
+{
+    "sip": {
+        "server": "sip.example.com",
+        "port": 5060,
+        "username": "<username>",
+        "password": "<password>"
+    },
+    "audio": {
+        "welcome": "/pfad/zu/willkommen.wav",
+        "hold_music": "/pfad/zu/haltemusik.wav",
+        "announcements": [
+            "/pfad/zu/ansage1.wav",
+            "/pfad/zu/ansage2.wav"
+        ],
+        "announcement_interval": {
+            "min": 60,
+            "max": 180
+        }
+    }
+}

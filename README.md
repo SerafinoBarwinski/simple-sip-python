@@ -2,7 +2,7 @@
 
 Pure-Python SIP VoIP client library (no external dependencies for SIP/RTP).
 
-[![Publish to PyPI](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml)
+Build Status: [![Publish to PyPI](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml)
 ## Project Structure
 
 ```

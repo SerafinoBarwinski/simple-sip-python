@@ -159,7 +159,7 @@ class MediaStream:
             import sounddevice as sd
             import numpy as np
         except ImportError:
-            logger.warning("sounddevice nicht installiert – Audio stumm")
+            logger.warning("sounddevice not installed – no audio output")
             return
 
         def callback(outdata, frames, time_info, status):

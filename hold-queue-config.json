@@ -6,11 +6,11 @@
         "password": "<password>"
     },
     "audio": {
-        "welcome": "/pfad/zu/willkommen.wav",
-        "hold_music": "/pfad/zu/haltemusik.wav",
+        "welcome": "/path/to/welcome.wav",
+        "hold_music": "/path/to/hold_music.wav",
         "announcements": [
-            "/pfad/zu/ansage1.wav",
-            "/pfad/zu/ansage2.wav"
+            "/path/to/announcement1.wav",
+            "/path/to/announcement2.wav"
         ],
         "announcement_interval": {
             "min": 60,

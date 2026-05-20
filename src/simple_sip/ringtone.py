@@ -18,7 +18,7 @@ PATTERNS = {
         "duty": [(0.15, 0.15, 0.15, 2.05)],  # (on, off, on, off) cycle
     },
     "busy": {
-        "desc": "schnelle Belegt-Töne",
+        "desc": "fast busy tone",
         "freq": 440,
         "duty": [(0.25, 0.25)],
     },
@@ -77,7 +77,7 @@ class Ringtone:
 
     Patterns:
       "ring" – ding-ding-pause-ding-ding (800 Hz)
-      "busy" – schnelle Belegt-Töne (440 Hz)
+      "busy" – fast busy tone (440 Hz)
 
     Tries sounddevice first, then aplay/paplay/ffplay/play.
     """

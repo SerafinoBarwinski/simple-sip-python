@@ -134,10 +134,10 @@ class SIPClient:
                 username: str = "", password: str = "",
                 display_name: str = "",
                 local_port: int = 5060) -> bool:
-        # DNS auflösen: Hostname → IP (damit send_and_wait Vergleiche funktionieren)
+        # Resolve hostname to IP (so send_and_wait comparisons work)
         server_ip = self._resolve_host(server)
         if not server_ip:
-            logger.error(f"Kann {server} nicht auflösen")
+            logger.error(f"Cannot resolve {server}")
             return False
 
         self.server_addr = (server_ip, port)
@@ -434,7 +434,7 @@ class SIPClient:
             logger.error("No original INVITE to retry")
             return
 
-        # ACK for the 401 (non-2xx final response) – gleicher Branch, gleiches CSeq
+        # ACK for the 401 (non-2xx final response) – same branch, same CSeq
         ack = SIPRequest("ACK", str(call.callee_uri))
         via_val = orig.get_header("Via")
         if via_val:

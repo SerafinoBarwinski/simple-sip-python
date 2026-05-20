@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-queue-demo.py – Automatische Ansage/Musik bei eingehenden Anrufen
+queue-demo.py – Auto-announcement/music on incoming calls
 
-Streamt eine Audio-Datei als RTP (G.711 μ-law/PCMU) an den Anrufer.
+Streams an audio file as RTP (G.711 μ-law/PCMU) to the caller.
 Supported: WAV (stdlib), MP3/OGG/FLAC/... (via ffmpeg)
 """
 import argparse
@@ -34,7 +34,7 @@ from simple_sip.sip_sdp import parse_sdp
 from simple_sip.sip_media import ulaw2linear
 
 def linear2ulaw(sample: int) -> int:
-    """16-bit linear PCM to 8-bit G.711 μ-law (direkte Formel)."""
+    """16-bit linear PCM to 8-bit G.711 μ-law (direct formula)."""
     BIAS = 0x84; CLIP = 32635
     sign = 0
     if sample < 0:
@@ -98,7 +98,7 @@ def _load_wav(path: str) -> bytes:
 
 def _load_ffmpeg(path: str) -> bytes:
     if not shutil_which("ffmpeg"):
-        logging.error("ffmpeg nicht gefunden – installiere es oder verwende .wav")
+        logging.error("ffmpeg not found – install it or use .wav")
         sys.exit(1)
     cmd = [
         "ffmpeg", "-v", "quiet", "-i", path,
@@ -108,17 +108,17 @@ def _load_ffmpeg(path: str) -> bytes:
     try:
         result = subprocess.run(cmd, capture_output=True, timeout=30)
     except subprocess.TimeoutExpired:
-        logging.error("ffmpeg timeout beim Dekodieren von %s", path)
+        logging.error("ffmpeg timeout decoding %s", path)
         sys.exit(1)
     if result.returncode != 0:
-        logging.error("ffmpeg Fehler: %s", result.stderr.decode(errors="replace"))
+        logging.error("ffmpeg error: %s", result.stderr.decode(errors="replace"))
         sys.exit(1)
     return result.stdout
 
 
 def _resample(raw: bytes, in_rate: int, out_rate: int) -> bytes:
     if not shutil_which("ffmpeg"):
-        logging.warning("ffmpeg fehlt – kann Sample-Rate %d→%d nicht konvertieren",
+        logging.warning("ffmpeg missing – cannot convert sample rate %d→%d",
                         in_rate, out_rate)
         return raw
     cmd = [
@@ -128,7 +128,7 @@ def _resample(raw: bytes, in_rate: int, out_rate: int) -> bytes:
     ]
     result = subprocess.run(cmd, input=raw, capture_output=True, timeout=30)
     if result.returncode != 0:
-        logging.warning("Resampling fehlgeschlagen, verwende Original-Rate")
+        logging.warning("Resampling failed, using original rate")
         return raw
     return result.stdout
 
@@ -148,7 +148,7 @@ def generate_tone(freq: float = 440, duration: float = 10.0,
 # ── RTP Streamer ─────────────────────────────────────────────────
 
 class RTPStreamer:
-    """Sendet μ-law Audio als RTP an den Anrufer."""
+    """Sends μ-law audio as RTP to the caller."""
 
     def __init__(self, remote_addr: tuple, pt: int = 0):
         self.remote = remote_addr
@@ -205,10 +205,10 @@ class RTPStreamer:
 
 
 def extract_remote_addr(invite_body: str) -> tuple:
-    """Extrahiere (ip, port) des Anrufers aus INVITE-SDP."""
+    """Extract caller (ip, port) from INVITE SDP."""
     sdp = parse_sdp(invite_body)
     if not sdp or not sdp.media:
-        raise ValueError("Keine SDP-Medien im INVITE")
+        raise ValueError("No SDP media in INVITE")
     m = sdp.media[0]
     return (sdp.unicast_address, m.port)
 
@@ -216,42 +216,42 @@ def extract_remote_addr(invite_body: str) -> tuple:
 # ── Main ─────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Queue-Demo – Musik für Anrufer")
+    parser = argparse.ArgumentParser(description="Queue-Demo – music for callers")
     parser.add_argument("audio", nargs="?", default=None,
-                        help="Audio-Datei (wav/mp3/ogg/...)")
+                        help="Audio file (wav/mp3/ogg/...)")
     parser.add_argument("--loop", action="store_true", default=True,
-                        help="Datei in Dauerschleife abspielen")
+                        help="Loop file continuously")
     parser.add_argument("--no-loop", dest="loop", action="store_false")
     parser.add_argument("--tone", type=float, default=None,
-                        help="Frequenz in Hz statt Datei (z.B. 440)")
+                        help="Frequency in Hz instead of file (e.g. 440)")
     args = parser.parse_args()
 
     if not args.audio and args.tone is None:
-        print("Benutzung: queue-demo.py <audio-datei> [--no-loop]")
-        print("  oder:    queue-demo.py --tone 440")
+        print("Usage: queue-demo.py <audio-file> [--no-loop]")
+        print("  or:   queue-demo.py --tone 440")
         sys.exit(1)
 
-    logging.info("Lade Audio...")
+    logging.info("Loading audio...")
     if args.tone:
         pcm = generate_tone(args.tone)
-        src_desc = f"Sinuston {args.tone} Hz"
+        src_desc = f"Sine wave {args.tone} Hz"
     else:
         pcm = load_audio(args.audio)
         src_desc = os.path.basename(args.audio)
 
     ulaw = pcm16_to_ulaw(pcm)
     duration = len(ulaw) / 8000
-    logging.info("Audio geladen: %.1f Sekunden (%d Bytes μ-law, %s)",
+    logging.info("Audio loaded: %.1f seconds (%d bytes μ-law, %s)",
                  duration, len(ulaw), src_desc)
 
     client = SIPClient()
-    client.on("registered", lambda h: logging.info("✓ Registriert bei %s", h))
+    client.on("registered", lambda h: logging.info("✓ Registered at %s", h))
 
     active_streamer = None
 
     def on_invite(call):
         nonlocal active_streamer
-        logging.info("📞 Eingehender Anruf von: %s", call.caller_number)
+        logging.info("📞 Incoming call from: %s", call.caller_number)
 
         if active_streamer:
             active_streamer.stop()
@@ -259,12 +259,12 @@ def main():
         try:
             remote = extract_remote_addr(call._invite_req.body or "")
         except (ValueError, AttributeError) as e:
-            logging.error("SDP-Fehler: %s", e)
+            logging.error("SDP error: %s", e)
             call.reject(488, "Not Acceptable Here")
             return
 
         call.accept()
-        logging.info("✓ Anruf angenommen, stream Audio -> %s:%d",
+        logging.info("✓ Call accepted, streaming audio -> %s:%d",
                       remote[0], remote[1])
 
         streamer = RTPStreamer(remote, pt=0)
@@ -273,7 +273,7 @@ def main():
 
     def on_call_ended(c):
         nonlocal active_streamer
-        logging.info("✗ Anruf beendet: %s", c.caller_number)
+        logging.info("✗ Call ended: %s", c.caller_number)
         if active_streamer:
             active_streamer.stop()
             active_streamer = None
@@ -295,14 +295,14 @@ def main():
 
     ok = client.connect(SERVER, PORT, USER, PASS, local_port=0)
     if not ok:
-        logging.error("Verbindung fehlgeschlagen")
+        logging.error("Connection failed")
         sys.exit(1)
 
-    logging.info("Warte auf Anrufe... (Strg+C zum Beenden)")
+    logging.info("Waiting for calls... (Ctrl+C to quit)")
     try:
         client.run()
     except KeyboardInterrupt:
-        logging.info("Beende...")
+        logging.info("Shutting down...")
     finally:
         client.stop()
 

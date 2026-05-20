@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SIP VoIP Client – Demo (Bibliotheksnutzung)
+SIP VoIP Client – Demo (library usage)
 """
 import logging
 import os
@@ -10,7 +10,7 @@ import threading
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 
-# Debug-Logging aktivieren (auskommentieren für weniger Ausgabe)
+# Enable debug logging (comment out for less output)
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -20,41 +20,41 @@ logging.basicConfig(
 from simple_sip import SIPClient, CallState, Ringtone, PATTERNS, MediaStream
 
 # "ring" = ding ding – pause – ding ding (800 Hz)
-# "busy" = schnelle Belegt-Töne (440 Hz)
+# "busy" = fast busy tone (440 Hz)
 ringtone = Ringtone(pattern="ring")
 if ringtone.available:
     print(f"  ✓ Ringtone: {ringtone._player}  ({PATTERNS[ringtone.pattern]['desc']})")
 else:
-    print("  ! Kein Audio-Player – Installiere 'pip install sounddevice'")
-    print("    oder sorge für aplay/paplay/ffplay")
+    print("  ! No audio player – Install 'pip install sounddevice'")
+    print("    or ensure aplay/paplay/ffplay is available")
 
 try:
     import sounddevice
     print("  ✓ Audio-Wiedergabe: sounddevice")
 except ImportError:
-    print("  ! Kein Audio bei Anrufen – 'pip install sounddevice' für Sprachausgabe")
+    print("  ! No audio on calls – 'pip install sounddevice' for voice playback")
 
 
-# --- Connectivity-Check vor dem Connect ---
+# --- Connectivity check before connecting ---
 def check_server(host: str, port: int) -> bool:
-    """Prüft ob der Server überhaupt erreichbar ist (UDP)."""
+    """Check if the server is reachable (UDP)."""
     try:
         ip = socket.getaddrinfo(host, port, socket.AF_INET)[0][4][0]
         print(f"  ✓ DNS: {host} -> {ip}")
     except OSError as e:
-        print(f"  ✗ DNS-Fehler: {e}")
+        print(f"  ✗ DNS error: {e}")
         return False
 
-    # UDP "connect" ohne Daten zu senden (testet nur Routing)
+    # UDP "connect" without sending data (tests routing only)
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(1)
         s.connect((ip, port))
-        print(f"  ✓ Route zu {ip}:{port} OK (keine Firewall-Blockade auf IP-Ebene)")
+        print(f"  ✓ Route to {ip}:{port} OK (no firewall block at IP level)")
         s.close()
         return True
     except OSError as e:
-        print(f"  ! Route zu {ip}:{port} fehlgeschlagen: {e}")
+        print(f"  ! Route to {ip}:{port} failed: {e}")
         return False
 
 
@@ -62,54 +62,54 @@ def check_server(host: str, port: int) -> bool:
 client = SIPClient()
 
 # Events
-client.on("registered", lambda host: print(f"\n✓ Registriert bei {host}"))
+client.on("registered", lambda host: print(f"\n✓ Registered at {host}"))
 
 def on_invite(call):
-    print(f"\n📞 Eingehender Anruf von: {call.caller_number}")
+    print(f"\n📞 Incoming call from: {call.caller_number}")
     ringtone.play()
 
     def interactive():
-        print("  [Enter] annehmen  |  [r] ablehnen")
+        print("  [Enter] accept  |  [r] reject")
         choice = input().strip().lower()
         ringtone.stop()
         if choice == "r":
             call.reject()
-            print("   → Abgewiesen")
+            print("   → Rejected")
         else:
             call.accept()
-            print("   → Angenommen")
+            print("   → Accepted")
 
     threading.Thread(target=interactive, daemon=True).start()
 
 client.on("invite", on_invite)
-client.on("call_accepted", lambda c: print(f"✓ Anruf aktiv: {c.caller_number}"))
+client.on("call_accepted", lambda c: print(f"✓ Call active: {c.caller_number}"))
 client.on("call_rejected", lambda c, code, reason: ringtone.stop())
 
 def on_call_ended(c):
-    # Ausgehender Call: callee anzeigen, eingehender: caller anzeigen
+    # Outgoing call: show callee, incoming: show caller
     our_user = client.contact_uri.user if client.contact_uri else ""
     peer = c.callee_number if c.caller_uri.user == our_user else c.caller_number
-    print(f"✗ Anruf beendet: {peer}")
+    print(f"✗ Call ended: {peer}")
 
 client.on("call_ended", on_call_ended)
-client.on("call_active", lambda c: print(f"✓ Verbunden mit {c.callee_number}"))
-client.on("ringing", lambda c: print(f"🔔 Klingelt bei {c.callee_number}"))
-client.on("error", lambda msg: print(f"\n⚠ Fehler: {msg}"))
+client.on("call_active", lambda c: print(f"✓ Connected to {c.callee_number}"))
+client.on("ringing", lambda c: print(f"🔔 Ringing at {c.callee_number}"))
+client.on("error", lambda msg: print(f"\n⚠ Error: {msg}"))
 
 
-# --- Verbinden ---
+# --- Connect ---
 SERVER = "192.168.178.1"
 PORT = 5060
 USER = os.getenv("SIP_USER", "changeme")
 PASS = os.getenv("SIP_PASS", "")
 
-print(f"SIP Client starte:")
+print(f"SIP Client starting:")
 print(f"  Server: {SERVER}:{PORT}")
 print(f"  User:   {USER}")
 
 if not check_server(SERVER, PORT):
-    print("\n✗ Server nicht erreichbar – Netzwerk/Firewall prüfen!")
-    print("  Tipp: Läuft der SIP-Server auf einem anderen Port?")
+    print("\n✗ Server unreachable – check network/firewall!")
+    print("  Tip: Is the SIP server running on a different port?")
     sys.exit(1)
 
 ok = client.connect(
@@ -117,14 +117,14 @@ ok = client.connect(
     port=PORT,
     username=USER,
     password=PASS,
-    local_port=0,  # 0 = OS wählt freien Port (vermeidet Konflikte)
+    local_port=0,  # 0 = OS picks free port (avoids conflicts)
 )
 
 if ok:
-    print("\nVerbunden. Warte auf Anrufe... (Strg+C zum Beenden)")
-    print("  Rufnummer eingeben + Enter → ausgehender Anruf")
-    print("  Enter bei eingehendem Anruf → annehmen")
-    print("  'h' + Enter → aktiven Anruf beenden")
+    print("\nConnected. Waiting for calls... (Ctrl+C to quit)")
+    print("  Enter number + Enter → outgoing call")
+    print("  Enter on incoming call → accept")
+    print("  'h' + Enter → hang up active call")
     try:
         while True:
             import select
@@ -139,16 +139,16 @@ if ok:
                     if not line.startswith("0"):
                         line = "0" + line
                     number = f"sip:{line}@{SERVER}"
-                    print(f"  → Rufe {line} an...")
+                    print(f"  → Calling {line}...")
                     call = client.make_call(number)
                     if not call:
-                        print("  ✗ Konnte Anruf nicht starten")
+                        print("  ✗ Could not start call")
     except KeyboardInterrupt:
-        print("\nBeende...")
+        print("\nShutting down...")
     finally:
         client.stop()
 else:
-    print("\n✗ Verbindung fehlgeschlagen")
-    print("  Tipp: - Prüfe ob Server/Port stimmen")
-    print("        - Prüfe ob ein anderer Dienst den Port blockt")
-    print("        - Starte mit local_port=0 (wie oben)")
+    print("\n✗ Connection failed")
+    print("  Tip: - Check server/port are correct")
+    print("        - Check if another service is blocking the port")
+    print("        - Start with local_port=0 (as above)")

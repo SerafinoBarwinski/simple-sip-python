@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Debug: Speichert den rohen Audio-Stream vom Anrufer als WAV + Raw-Dump.
+Debug: Saves raw audio stream from caller as WAV + Raw dump.
 
-Nutze es genau wie demo.py, aber es schreibt die Audiodaten in Dateien
-statt sie abzuspielen. Schick mir die Dateien dann zur Analyse.
+Use it just like demo.py, but it writes audio data to files
+instead of playing them. Send me the files for analysis.
 
 Usage:
   python debug_audio.py
-  # Anruf tätigen, annehmen, warten, dann Ctrl+C
-  # Erzeugt: audio_dump_*.raw + audio_dump_*.wav
+  # Make call, answer, wait, then Ctrl+C
+  # Creates: audio_dump_*.raw + audio_dump_*.wav
 """
 import logging
 import os
@@ -31,7 +31,7 @@ from simple_sip.sip_media import RTPPacket, ulaw2linear, alaw2linear
 
 
 class DebugMedia:
-    """Fängt RTP-Audio und schreibt es in Dateien."""
+    """Captures RTP audio and writes it to files."""
 
     def __init__(self):
         self.sock = None
@@ -132,34 +132,34 @@ client = SIPClient()
 ringtone = Ringtone(pattern="ring")
 debug = DebugMedia()
 
-client.on("registered", lambda host: print(f"\n✓ Registriert bei {host}"))
+client.on("registered", lambda host: print(f"\n✓ Registered at {host}"))
 
 def on_invite(call):
-    print(f"\n📞 Eingehender Anruf von: {call.caller_number}")
+    print(f"\n📞 Incoming call from: {call.caller_number}")
     ringtone.play()
 
     def interactive():
-        print("  [Enter] annehmen (Audio-Debug)  |  [r] ablehnen")
+        print("  [Enter] accept (Audio-Debug)  |  [r] reject")
         choice = input().strip().lower()
         ringtone.stop()
         if choice == "r":
             call.reject()
-            print("   → Abgewiesen")
+            print("   → Rejected")
         else:
-            # Media durch DebugMedia ersetzen
+            # Replace media with DebugMedia
             call._media = debug
             call.accept()
-            print(f"   → Angenommen – zeichne Audio auf... Ctrl+C zum stoppen")
+            print(f"   → Accepted – recording audio... Ctrl+C to stop")
 
     threading.Thread(target=interactive, daemon=True).start()
 
 client.on("invite", on_invite)
-client.on("call_accepted", lambda c: print(f"✓ Anruf aktiv: {c.caller_number}"))
+client.on("call_accepted", lambda c: print(f"✓ Call active: {c.caller_number}"))
 client.on("call_rejected", lambda c, code, reason: ringtone.stop())
-client.on("call_ended", lambda c: print(f"✗ Anruf beendet: {c.caller_number}"))
-client.on("error", lambda msg: print(f"\n⚠ Fehler: {msg}"))
+client.on("call_ended", lambda c: print(f"✗ Call ended: {c.caller_number}"))
+client.on("error", lambda msg: print(f"\n⚠ Error: {msg}"))
 
-# Verbinden
+# Connect
 SERVER = "192.168.178.1"
 PORT = 5060
 USER = os.getenv("SIP_USER", "changeme")
@@ -176,14 +176,14 @@ ok = client.connect(
 )
 
 if ok:
-    print("\nVerbunden. Rufe jetzt an!")
-    print("  Enter → annehmen & Audio aufnehmen")
-    print("  Ctrl+C → beenden & Dateien speichern\n")
+    print("\nConnected. Make a call now!")
+    print("  Enter → accept & record audio")
+    print("  Ctrl+C → stop & save files\n")
     try:
         client.run()
     except KeyboardInterrupt:
-        print("\n\nSpeichere Audio...")
+        print("\n\nSaving audio...")
     finally:
         client.stop()
 else:
-    print("\n✗ Verbindung fehlgeschlagen")
+    print("\n✗ Connection failed")

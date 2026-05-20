@@ -1,8 +1,34 @@
-# simple-sip
+# simple-sip-client
+
+[![PyPI](https://img.shields.io/pypi/v/simple-sip-client)](https://pypi.org/project/simple-sip-client/)
+[![GitHub](https://img.shields.io/badge/github-SerafinoBarwinski%2Fsimple--sip--python-blue?logo=github)](https://github.com/SerafinoBarwinski/simple-sip-python)
+[![Build](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml)
 
 Pure-Python SIP VoIP client library (no external dependencies for SIP/RTP).
 
-Build Status: [![Publish to PyPI](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml)
+## Installation
+
+```bash
+# from PyPI
+pip install simple-sip-client
+
+# or from source (editable)
+pip install -e .
+```
+
+Then use from any script:
+
+```python
+from simple_sip import SIPClient
+```
+
+Or run demos directly (auto-adds `src/` to path):
+
+```bash
+python demo.py
+python hold-queue.py
+```
+
 ## Project Structure
 
 ```
@@ -26,25 +52,6 @@ voip/
         ├── sip_sdp.py      # SDP parser/answer/offer
         ├── sip_media.py    # RTP media stream
         └── ringtone.py     # Ringtone player
-```
-
-## Installation
-
-```bash
-pip install -e .
-```
-
-Then use from any script:
-
-```python
-from simple_sip import SIPClient
-```
-
-Or run demos directly (auto-adds `src/` to path):
-
-```bash
-python demo.py
-python hold-queue.py
 ```
 
 ## Demos

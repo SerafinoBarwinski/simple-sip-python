@@ -19,5 +19,9 @@ classifiers = [
     "Topic :: Communications :: Telephony",
 ]
 
+[project.urls]
+Homepage = "https://github.com/SerafinoBarwinski/simple-sip-python"
+Repository = "https://github.com/SerafinoBarwinski/simple-sip-python"
+
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -100,8 +100,8 @@ client.on("error", lambda msg: print(f"\n⚠ Fehler: {msg}"))
 # --- Verbinden ---
 SERVER = "192.168.178.1"
 PORT = 5060
-USER = "changeme"
-PASS = ""
+USER = os.getenv("SIP_USER", "changeme")
+PASS = os.getenv("SIP_PASS", "")
 
 print(f"SIP Client starte:")
 print(f"  Server: {SERVER}:{PORT}")

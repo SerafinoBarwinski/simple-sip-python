@@ -295,7 +295,7 @@ def main():
 
     SERVER = sip_cfg.get("server", "192.168.178.1")
     PORT = int(sip_cfg.get("port", 5060))
-    USER = sip_cfg.get("username", "changeme")
+    USER = sip_cfg.get("username", os.getenv("SIP_USER", ""))
     PASS = sip_cfg.get("password", "")
 
     welcome_path = audio_cfg.get("welcome", "")

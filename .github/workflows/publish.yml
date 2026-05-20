@@ -2,7 +2,6 @@ name: Publish to PyPI
 
 on:
   push:
-    branches: [main]
     tags: ["v*"]
 
 jobs:
@@ -28,4 +27,4 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: python -m twine upload dist/*
+        run: python -m twine upload --verbose dist/*

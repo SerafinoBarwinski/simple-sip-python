@@ -5,7 +5,6 @@ setup(
     version="0.1.0",
     description="Pure-Python SIP VoIP client library",
     author="simple-sip",
-    license="MIT",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     python_requires=">=3.10",

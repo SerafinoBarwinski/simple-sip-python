@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="simple-sip",
+    name="simple-sip-client",
     version="0.1.0",
     description="Pure-Python SIP VoIP client library",
     author="simple-sip",

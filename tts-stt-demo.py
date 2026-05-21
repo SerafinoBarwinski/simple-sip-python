@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 """
-voice-chat.py – Answer SIP calls and chat via voice (local STT/TTS).
+tts-stt-demo.py – Answer SIP calls and chat via voice (local STT/TTS).
 
 Transcribes caller speech to text (Vosk), lets you reply by typing,
 and speaks your response back via RTP (pyttsx3).
 
-Usage:
+Requirements:
   pip install vosk pyttsx3 simple-sip-client
-  python voice-chat.py
+  # Linux TTS backend:
+  apt install espeak-ng          # Debian/Ubuntu
+  pacman -S espeak-ng            # Arch
+  brew install espeak-ng         # macOS
+
+Usage:
+  python tts-stt-demo.py
 
 Then call in from a SIP phone and start chatting.
 """
+import io
 import logging
 import os
 import struct
@@ -94,9 +101,10 @@ if TTS_ENGINE is None:
         TTS_ENGINE = None
 
 if TTS_ENGINE is None:
-    print("No TTS engine found. Install espeak-ng or pyttsx3")
-    print("  Linux: apt install espeak-ng")
-    print("  pip: pip install pyttsx3")
+    print("No TTS engine found.")
+    print("  pip install pyttsx3")
+    print("  # and on Linux:")
+    print("  apt install espeak-ng")
     sys.exit(1)
 
 
@@ -256,9 +264,11 @@ def main():
     USER = os.environ.get("SIP_USER", "changeme")
     PASS = os.environ.get("SIP_PASS", "")
 
-    print("SIP Voice Chat")
+    print("SIP Voice Chat  (tts-stt-demo)")
     print(f"  Server: {SERVER}:{PORT}")
     print(f"  User:   {USER}")
+    print("  Reqs:  pip install vosk pyttsx3 simple-sip-client")
+    print("         apt install espeak-ng")
     print()
     print("  ⬇ Loading Vosk model (first run downloads ~40 MB)...")
     ensure_vosk_model()

@@ -338,14 +338,14 @@ def main():
 
     client = SIPClient()
     client.on("registered",
-              lambda h: logging.info("✓ Registered at %s", h))
+              lambda h: logging.info(" Registered at %s", h))
 
     streamer = None
     scheduler = None
 
     def on_invite(call):
         nonlocal streamer, scheduler
-        logging.info("📞 Call from: %s", call.caller_number)
+        logging.info(" Call from: %s", call.caller_number)
 
         if streamer:
             streamer.stop()
@@ -360,7 +360,7 @@ def main():
             return
 
         call.accept()
-        logging.info("✓ Accepted, sending audio to %s:%d",
+        logging.info(" Accepted, sending audio to %s:%d",
                      remote[0], remote[1])
 
         streamer = RTPStreamer(remote, pt=0)
@@ -377,7 +377,7 @@ def main():
 
     def on_call_ended(c):
         nonlocal streamer, scheduler
-        logging.info("✗ Call ended: %s", c.caller_number)
+        logging.info(" Call ended: %s", c.caller_number)
         if scheduler:
             scheduler.stop()
             scheduler = None
@@ -387,7 +387,7 @@ def main():
 
     client.on("invite", on_invite)
     client.on("call_ended", on_call_ended)
-    client.on("error", lambda m: logging.error("⚠ %s", m))
+    client.on("error", lambda m: logging.error(" %s", m))
 
     print("SIP Hold-Queue")
     print(f"  Config: {cfg_path}")

@@ -17,7 +17,7 @@ import threading
 import time
 import wave
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
 
 logging.basicConfig(
     level=logging.INFO,
@@ -245,13 +245,13 @@ def main():
                  duration, len(ulaw), src_desc)
 
     client = SIPClient()
-    client.on("registered", lambda h: logging.info("✓ Registered at %s", h))
+    client.on("registered", lambda h: logging.info(" Registered at %s", h))
 
     active_streamer = None
 
     def on_invite(call):
         nonlocal active_streamer
-        logging.info("📞 Incoming call from: %s", call.caller_number)
+        logging.info(" Incoming call from: %s", call.caller_number)
 
         if active_streamer:
             active_streamer.stop()
@@ -264,7 +264,7 @@ def main():
             return
 
         call.accept()
-        logging.info("✓ Call accepted, streaming audio -> %s:%d",
+        logging.info(" Call accepted, streaming audio -> %s:%d",
                       remote[0], remote[1])
 
         streamer = RTPStreamer(remote, pt=0)
@@ -273,14 +273,14 @@ def main():
 
     def on_call_ended(c):
         nonlocal active_streamer
-        logging.info("✗ Call ended: %s", c.caller_number)
+        logging.info(" Call ended: %s", c.caller_number)
         if active_streamer:
             active_streamer.stop()
             active_streamer = None
 
     client.on("invite", on_invite)
     client.on("call_ended", on_call_ended)
-    client.on("error", lambda m: logging.error("⚠ %s", m))
+    client.on("error", lambda m: logging.error(" %s", m))
 
     SERVER = os.environ.get("SIP_SERVER", "192.168.178.1")
     PORT = int(os.environ.get("SIP_PORT", "5060"))

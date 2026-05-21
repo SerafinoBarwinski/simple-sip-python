@@ -18,7 +18,7 @@ import sys
 import threading
 import time
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -56,7 +56,7 @@ class DebugMedia:
         self._start_time = time.time()
         self._thread = threading.Thread(target=self._recv_loop, daemon=True)
         self._thread.start()
-        print(f"  ▶ DebugMedia auf Port {self.rtp_port} (PT={payload_type})")
+        print(f"   DebugMedia auf Port {self.rtp_port} (PT={payload_type})")
         return self.rtp_port
 
     def stop(self):
@@ -113,7 +113,7 @@ class DebugMedia:
         raw_path = f"audio_dump_{ts}.raw"
         with open(raw_path, "wb") as f:
             f.write(bytes(self._raw_payloads))
-        print(f"  ▶ Raw-Dump: {raw_path}  ({len(self._raw_payloads)} Bytes, {codec_name})")
+        print(f"   Raw-Dump: {raw_path}  ({len(self._raw_payloads)} Bytes, {codec_name})")
 
         # WAV (dekodiertes 16-bit PCM)
         wav_path = f"audio_dump_{ts}.wav"
@@ -123,8 +123,8 @@ class DebugMedia:
             wf.setsampwidth(2)
             wf.setframerate(8000)
             wf.writeframes(bytes(self._decoded_pcm))
-        print(f"  ▶ WAV-Datei: {wav_path}  ({len(self._decoded_pcm)} Bytes, ~{duration:.1f}s)")
-        print(f"  ▶ Pakete: {self._packet_count}")
+        print(f"   WAV-Datei: {wav_path}  ({len(self._decoded_pcm)} Bytes, ~{duration:.1f}s)")
+        print(f"   Pakete: {self._packet_count}")
 
 
 # === Client-Code ===
@@ -132,10 +132,10 @@ client = SIPClient()
 ringtone = Ringtone(pattern="ring")
 debug = DebugMedia()
 
-client.on("registered", lambda host: print(f"\n✓ Registered at {host}"))
+client.on("registered", lambda host: print(f"\n Registered at {host}"))
 
 def on_invite(call):
-    print(f"\n📞 Incoming call from: {call.caller_number}")
+    print(f"\n Incoming call from: {call.caller_number}")
     ringtone.play()
 
     def interactive():
@@ -154,10 +154,10 @@ def on_invite(call):
     threading.Thread(target=interactive, daemon=True).start()
 
 client.on("invite", on_invite)
-client.on("call_accepted", lambda c: print(f"✓ Call active: {c.caller_number}"))
+client.on("call_accepted", lambda c: print(f" Call active: {c.caller_number}"))
 client.on("call_rejected", lambda c, code, reason: ringtone.stop())
-client.on("call_ended", lambda c: print(f"✗ Call ended: {c.caller_number}"))
-client.on("error", lambda msg: print(f"\n⚠ Error: {msg}"))
+client.on("call_ended", lambda c: print(f" Call ended: {c.caller_number}"))
+client.on("error", lambda msg: print(f"\n Error: {msg}"))
 
 # Connect
 SERVER = "192.168.178.1"
@@ -186,4 +186,4 @@ if ok:
     finally:
         client.stop()
 else:
-    print("\n✗ Connection failed")
+    print("\n Connection failed")

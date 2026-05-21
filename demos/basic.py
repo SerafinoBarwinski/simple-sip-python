@@ -8,7 +8,7 @@ import socket
 import sys
 import threading
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
 
 # Enable debug logging (comment out for less output)
 logging.basicConfig(
@@ -23,14 +23,14 @@ from simple_sip import SIPClient, CallState, Ringtone, PATTERNS, MediaStream
 # "busy" = fast busy tone (440 Hz)
 ringtone = Ringtone(pattern="ring")
 if ringtone.available:
-    print(f"  ✓ Ringtone: {ringtone._player}  ({PATTERNS[ringtone.pattern]['desc']})")
+    print(f"   Ringtone: {ringtone._player}  ({PATTERNS[ringtone.pattern]['desc']})")
 else:
     print("  ! No audio player – Install 'pip install sounddevice'")
     print("    or ensure aplay/paplay/ffplay is available")
 
 try:
     import sounddevice
-    print("  ✓ Audio-Wiedergabe: sounddevice")
+    print("   Audio-Wiedergabe: sounddevice")
 except ImportError:
     print("  ! No audio on calls – 'pip install sounddevice' for voice playback")
 
@@ -40,9 +40,9 @@ def check_server(host: str, port: int) -> bool:
     """Check if the server is reachable (UDP)."""
     try:
         ip = socket.getaddrinfo(host, port, socket.AF_INET)[0][4][0]
-        print(f"  ✓ DNS: {host} -> {ip}")
+        print(f"   DNS: {host} -> {ip}")
     except OSError as e:
-        print(f"  ✗ DNS error: {e}")
+        print(f"   DNS error: {e}")
         return False
 
     # UDP "connect" without sending data (tests routing only)
@@ -50,7 +50,7 @@ def check_server(host: str, port: int) -> bool:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(1)
         s.connect((ip, port))
-        print(f"  ✓ Route to {ip}:{port} OK (no firewall block at IP level)")
+        print(f"   Route to {ip}:{port} OK (no firewall block at IP level)")
         s.close()
         return True
     except OSError as e:
@@ -62,10 +62,10 @@ def check_server(host: str, port: int) -> bool:
 client = SIPClient()
 
 # Events
-client.on("registered", lambda host: print(f"\n✓ Registered at {host}"))
+client.on("registered", lambda host: print(f"\n Registered at {host}"))
 
 def on_invite(call):
-    print(f"\n📞 Incoming call from: {call.caller_number}")
+    print(f"\n Incoming call from: {call.caller_number}")
     ringtone.play()
 
     def interactive():
@@ -82,19 +82,19 @@ def on_invite(call):
     threading.Thread(target=interactive, daemon=True).start()
 
 client.on("invite", on_invite)
-client.on("call_accepted", lambda c: print(f"✓ Call active: {c.caller_number}"))
+client.on("call_accepted", lambda c: print(f" Call active: {c.caller_number}"))
 client.on("call_rejected", lambda c, code, reason: ringtone.stop())
 
 def on_call_ended(c):
     # Outgoing call: show callee, incoming: show caller
     our_user = client.contact_uri.user if client.contact_uri else ""
     peer = c.callee_number if c.caller_uri.user == our_user else c.caller_number
-    print(f"✗ Call ended: {peer}")
+    print(f" Call ended: {peer}")
 
 client.on("call_ended", on_call_ended)
-client.on("call_active", lambda c: print(f"✓ Connected to {c.callee_number}"))
-client.on("ringing", lambda c: print(f"🔔 Ringing at {c.callee_number}"))
-client.on("error", lambda msg: print(f"\n⚠ Error: {msg}"))
+client.on("call_active", lambda c: print(f" Connected to {c.callee_number}"))
+client.on("ringing", lambda c: print(f" Ringing at {c.callee_number}"))
+client.on("error", lambda msg: print(f"\n Error: {msg}"))
 
 
 # --- Connect ---
@@ -108,7 +108,7 @@ print(f"  Server: {SERVER}:{PORT}")
 print(f"  User:   {USER}")
 
 if not check_server(SERVER, PORT):
-    print("\n✗ Server unreachable – check network/firewall!")
+    print("\n Server unreachable – check network/firewall!")
     print("  Tip: Is the SIP server running on a different port?")
     sys.exit(1)
 
@@ -142,13 +142,13 @@ if ok:
                     print(f"  → Calling {line}...")
                     call = client.make_call(number)
                     if not call:
-                        print("  ✗ Could not start call")
+                        print("   Could not start call")
     except KeyboardInterrupt:
         print("\nShutting down...")
     finally:
         client.stop()
 else:
-    print("\n✗ Connection failed")
+    print("\n Connection failed")
     print("  Tip: - Check server/port are correct")
     print("        - Check if another service is blocking the port")
     print("        - Start with local_port=0 (as above)")

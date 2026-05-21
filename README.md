@@ -24,11 +24,11 @@ Then use from any script:
 from simple_sip import SIPClient
 ```
 
-Or run demos directly (auto-adds `src/` to path):
+Or run demos directly:
 
 ```bash
-python demo.py
-python hold-queue.py
+python demos/basic.py
+python demos/tts-stt.py
 ```
 
 ## Project Structure
@@ -39,11 +39,13 @@ voip/
 ├── setup.py
 ├── pyproject.toml
 ├── hold-queue-config.json
-├── demo.py              # Interactive SIP client demo
 ├── hold-queue.py        # Music-on-hold with announcements
-├── queue-demo.py        # Simple audio streaming demo
-├── debug_audio.py       # RTP audio dump tool
 ├── main.py              # CLI-based SIP client
+├── demos/
+│   ├── basic.py         # Interactive SIP client demo
+│   ├── queue.py         # Simple audio streaming demo
+│   ├── debug-audio.py   # RTP audio dump tool
+│   └── tts-stt.py       # Voice chat with local STT/TTS
 └── src/
     └── simple_sip/      # Python package
         ├── __init__.py
@@ -58,10 +60,11 @@ voip/
 
 ## Demos
 
-- **demo.py** – Interactive SIP client (receive/make calls)
+- **basic.py** – Interactive SIP client (receive/make calls)
 - **hold-queue.py** – Auto-answer with music-on-hold + announcements
-- **queue-demo.py** – Stream audio file as RTP to caller
-- **debug_audio.py** – Save incoming RTP audio to WAV files
+- **queue.py** – Stream audio file as RTP to caller
+- **debug-audio.py** – Save incoming RTP audio to WAV files
+- **tts-stt.py** – Voice chat with local STT/TTS
 - **main.py** – CLI with `--on-invite` scripts
 
 ## Configuration

@@ -134,10 +134,11 @@ from simple_sip.sip_auth import DigestAuth
 
 | Demo | Description |
 |------|-------------|
-| `demo.py` | Interactive SIP client – receive/make calls |
+| `basic.py` | Interactive SIP client – receive/make calls |
 | `hold-queue.py` | Auto-answer with music-on-hold + announcements |
-| `queue-demo.py` | Stream audio file as RTP to caller |
-| `debug_audio.py` | Save incoming RTP audio to WAV files |
+| `queue.py` | Stream audio file as RTP to caller |
+| `debug-audio.py` | Save incoming RTP audio to WAV files |
+| `tts-stt.py` | Voice chat with local STT/TTS |
 | `main.py` | CLI with `--on-invite` scripts |
 
 ## Configuration

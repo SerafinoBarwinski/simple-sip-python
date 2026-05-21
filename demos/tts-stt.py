@@ -27,7 +27,7 @@ import time
 import wave
 from collections import deque
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,7 +37,7 @@ logging.basicConfig(
 
 logger = logging.getLogger("voicechat")
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VOSK_MODEL_DIR = os.path.join(HERE, "vosk-model")
 VOSK_MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-small-de-0.15.zip"
 
@@ -46,7 +46,7 @@ def ensure_vosk_model():
         return
     if not os.path.isdir(VOSK_MODEL_DIR):
         os.makedirs(VOSK_MODEL_DIR, exist_ok=True)
-    print("  ⬇ Downloading Vosk model (~40 MB)...")
+    print("  Downloading Vosk model (~40 MB)...")
     import urllib.request
     import zipfile
     zip_path = os.path.join(VOSK_MODEL_DIR, "model.zip")
@@ -108,7 +108,7 @@ if TTS_ENGINE is None:
     sys.exit(1)
 
 
-# ── Vosk STT ─────────────────────────────────────────────────────
+# Vosk STT
 
 class SpeechTranscriber:
     def __init__(self, model_path: str, sample_rate: int = 8000):
@@ -132,7 +132,7 @@ class SpeechTranscriber:
                 data = json.loads(result)
                 if data.get("text"):
                     self.transcriptions.append(data["text"])
-                    print(f"\n  🗣 Caller: {data['text']}")
+                    print(f"\n  Caller: {data['text']}")
 
     def get_latest(self) -> str:
         with self._lock:
@@ -142,7 +142,7 @@ class SpeechTranscriber:
             return " ".join(parts)
 
 
-# ── TTS ──────────────────────────────────────────────────────────
+# TTS
 
 def generate_tts_audio(text: str, rate: int = 8000) -> bytes:
     pcm = bytearray()
@@ -188,7 +188,7 @@ def _resample_pcm(raw: bytes, in_rate: int, out_rate: int) -> bytes:
     return r.stdout if r.returncode == 0 else raw
 
 
-# ── RTP Streamer for TTS playback ────────────────────────────────
+# RTP streamer for TTS playback
 
 class RTPTalker:
     def __init__(self, remote_addr: tuple, transcriber: SpeechTranscriber):
@@ -256,7 +256,7 @@ class RTPTalker:
             pass
 
 
-# ── Main Application ─────────────────────────────────────────────
+# Main
 
 def main():
     SERVER = os.environ.get("SIP_SERVER", "192.168.178.1")
@@ -270,28 +270,26 @@ def main():
     print("  Reqs:  pip install vosk pyttsx3 simple-sip-client")
     print("         apt install espeak-ng")
     print()
-    print("  ⬇ Loading Vosk model (first run downloads ~40 MB)...")
+    print("   Loading Vosk model (first run downloads ~40 MB)...")
     ensure_vosk_model()
     transcriber = SpeechTranscriber(VOSK_MODEL_DIR)
-    print("  ✓ Vosk ready")
-    print(f"  ✓ TTS engine: {TTS_ENGINE}")
+    print("  Vosk ready")
+    print(f"  TTS engine: {TTS_ENGINE}")
     print()
 
     client = SIPClient()
     talker = None
 
-    client.on("registered", lambda h: print(f"✓ Registered at {h}"))
+    client.on("registered", lambda h: print(f"Registered at {h}"))
 
     def on_invite(call):
         nonlocal talker
-        print(f"\n📞 Incoming call from: {call.caller_number}")
+        print(f"\nIncoming call from: {call.caller_number}")
         call.accept()
-        print("  ✓ Call accepted – starting voice chat")
-        print("  ─────────────────────────────────────")
-        print("  🗣 Caller speech → transcribed below")
-        print("  ⌨ Type your reply + Enter → spoken back")
-        print("  📞 h + Enter → hang up")
-        print("  ─────────────────────────────────────\n")
+        print("  Call accepted – starting voice chat")
+        print("  Caller speech will appear below")
+        print("  Type your reply + Enter to speak")
+        print("  h + Enter to hang up\n")
 
         from simple_sip.sip_sdp import parse_sdp
         sdp = parse_sdp(call._invite_req.body or "")
@@ -334,7 +332,7 @@ def main():
                         call.hangup()
                         break
                     if line:
-                        print(f"  💬 You: {line}")
+                        print(f"  You: {line}")
                         talker.play(line)
             except (EOFError, KeyboardInterrupt):
                 call.hangup()
@@ -342,8 +340,8 @@ def main():
         threading.Thread(target=chat_loop, daemon=True).start()
 
     client.on("invite", on_invite)
-    client.on("call_ended", lambda c: print(f"✗ Call ended: {c.caller_number}"))
-    client.on("error", lambda m: print(f"⚠ Error: {m}"))
+    client.on("call_ended", lambda c: print(f"Call ended: {c.caller_number}"))
+    client.on("error", lambda m: print(f"Error: {m}"))
 
     ok = client.connect(SERVER, PORT, USER, PASS, local_port=0)
     if not ok:

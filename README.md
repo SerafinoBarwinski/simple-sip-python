@@ -6,6 +6,8 @@
 
 Pure-Python SIP VoIP client library (no external dependencies for SIP/RTP).
 
+Full documentation: [docs/index.md](docs/index.md)
+
 ## Installation
 
 ```bash

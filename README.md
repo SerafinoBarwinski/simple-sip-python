@@ -4,7 +4,7 @@
 [![GitHub](https://img.shields.io/badge/github-SerafinoBarwinski%2Fsimple--sip--python-blue?logo=github)](https://github.com/SerafinoBarwinski/simple-sip-python)
 [![Publish to PyPI](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml/badge.svg?event=release)](https://github.com/SerafinoBarwinski/simple-sip-python/actions/workflows/publish.yml)
 
-Pure-Python SIP VoIP client library (no external dependencies for SIP/RTP).
+Pure-Python SIP VoIP client library (no external dependencies for SIP/RTP). Can be used ala CLI Tool or Code Library.
 
 Full documentation: [docs/index.md](docs/index.md)
 

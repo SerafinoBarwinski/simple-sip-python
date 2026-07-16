@@ -329,7 +329,9 @@ class SIPClient:
     def _hangup_call(self, call: Call):
         """End an active call with BYE."""
         if call.state != CallState.ACTIVE:
+            logger.warning("Cannot hangup: call is not active (state: %s)", call.state)
             return
+        
         call.state = CallState.TERMINATED
         self.cseq += 1
         bye = SIPRequest("BYE", str(call.callee_uri))
@@ -341,8 +343,14 @@ class SIPClient:
         bye.set_header("CSeq", f"{self.cseq} BYE")
         bye.set_header("Content-Length", "0")
         bye.set_header("Contact", f"<{self.contact_uri}>")
+        
+        logger.info("BYE -> %s (CSeq: %d)", self.server_addr, self.cseq)
         self.transport.send_message(bye, self.server_addr)
         self._emit("call_ended", call)
+        
+        # Remove call from active calls dict
+        if call.call_id in self.calls:
+            del self.calls[call.call_id]
 
     # --- Message Handling ---
 
@@ -519,10 +527,15 @@ class SIPClient:
             if call._media:
                 call._media.stop()
                 call._media = None
-        self._emit("hangup", call)
+            logger.info("Received BYE for call: %s", call_id)
+        self._emit("call_ended", call)
 
         ok = make_response(req, 200, "OK")
         self.transport.send_message(ok, addr)
+        
+        # Remove call from active calls dict
+        if call_id in self.calls:
+            del self.calls[call_id]
 
     def _handle_cancel(self, req: SIPRequest, addr: Tuple[str, int]):
         call_id = req.get_header("Call-ID") or ""
